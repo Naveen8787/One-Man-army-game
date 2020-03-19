@@ -1,7 +1,7 @@
 #mycanvas {
-    border: 2px solid black;
-    background-color: white;
-    background-image: url('/Images/back.jpg');
+    border: 3px solid black;
+    /* background-color: white;
+    background-image: url('/Images/back1.png');*/
     position: relative;
     left: 226px;
 }
@@ -21,7 +21,7 @@ p {
 /*To set gradient of colors in the background */
 
 #gradient {
-    z-index: -2;
+    z-index: -1;
     position: fixed;
     top: 0;
     left: 0;
@@ -29,9 +29,9 @@ p {
     width: 100vw;
     height: 100vh;
     color: #fff;
-    background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB, black);
+    background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
     background-size: 400% 400%;
-    animation: Gradient 15s ease infinite;
+    animation: Gradient 8s ease infinite;
 }
 
 @keyframes Gradient {
