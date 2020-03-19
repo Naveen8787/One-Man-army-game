@@ -1,0 +1,47 @@
+#mycanvas {
+    border: 2px solid black;
+    background-color: white;
+    background-image: url('/Images/back.jpg');
+    position: relative;
+    left: 226px;
+}
+
+* {
+    -webkit-user-select: none;
+    /*disable text selection */
+}
+
+h1,
+p {
+    text-align: center;
+    font-family: Verdana, Tahoma, sans-serif;
+}
+
+
+/*To set gradient of colors in the background */
+
+#gradient {
+    z-index: -2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    color: #fff;
+    background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB, black);
+    background-size: 400% 400%;
+    animation: Gradient 15s ease infinite;
+}
+
+@keyframes Gradient {
+    0% {
+        background-position: 0% 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0% 50%
+    }
+}
