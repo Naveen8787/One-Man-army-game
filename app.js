@@ -1,8 +1,8 @@
 window.addEventListener("load", function() {
 
-    one = new Audio('./audio/pink.mp3');
+    /*one = new Audio('./audio / pink.mp3 ');
     one.loop = true;
-    one.play();
+    one.play(); */
     //constants
     var GAME_WIDTH = 1080;
     var GAME_HEIGHT = 580;
@@ -65,8 +65,6 @@ window.addEventListener("load", function() {
         h: 90
     }
 
-    var sprites = {};
-
     var movePlayer = function() {
         one = new Audio('./audio/foot.mp3');
         one.play();
@@ -76,6 +74,21 @@ window.addEventListener("load", function() {
     var stopPlayer = function() {
         player.isMoving = false;
     }
+    document.addEventListener("keydown", keyDownHandler);
+
+    function keyDownHandler(event) {
+        var keyPressed = String.fromCharCode(event.keyCode);
+        if (keyPressed == "W") {
+            one = new Audio('./audio/foot.mp3');
+            one.play();
+            player.isMoving = true;
+        } else if (keyPressed == "S") {
+            player.isMoving = false;
+        } else {
+            player.isMoving = false;
+        }
+    }
+
 
     //grab the canvas and context
     var canvas = document.getElementById("mycanvas");
@@ -87,6 +100,10 @@ window.addEventListener("load", function() {
     canvas.addEventListener('mouseup', stopPlayer);
     canvas.addEventListener('touchstart', movePlayer);
     canvas.addEventListener('touchend', stopPlayer);
+
+
+
+
 
     //update the logic
     var update = function() {
@@ -186,7 +203,7 @@ window.addEventListener("load", function() {
 
         //draw player
         var img = new Image();
-        img.src = './Images/soldier.png';
+        img.src = './Images/soldier1.png';
         /*var img = document.getElementById("man");*/
         ctx.drawImage(img, player.x, player.y, player.w, player.h);
 
