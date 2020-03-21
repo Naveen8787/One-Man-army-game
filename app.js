@@ -4,18 +4,18 @@ window.addEventListener("load", function() {
     one.loop = true;
     one.play(); */
     //constants
-    var GAME_WIDTH = 1080;
-    var GAME_HEIGHT = 580;
+    var width = 1080;
+    var height = 580;
 
     //keep the game going
-    var gameLive = true;
+    var Live = true;
 
     //current level
     var level = 1;
     var life = 5;
 
-    //enemies
-    var enemies = [{
+    //attackers
+    var attackers = [{
         x: 160, //x coordinate
         y: 100, //y coordinate
         speedY: 2, //speed in Y
@@ -52,13 +52,14 @@ window.addEventListener("load", function() {
         x: 10,
         y: 260,
         speedX: 2,
+        isback: false,
         isMoving: false, //keep track whether the player is moving or not
         w: 60,
         h: 60
     };
 
-    //the goal object
-    var goal = {
+    //the ending point object
+    var ending = {
         x: 980,
         y: 240,
         w: 90,
@@ -70,30 +71,38 @@ window.addEventListener("load", function() {
         one.play();
         player.isMoving = true;
     }
-
     var stopPlayer = function() {
         player.isMoving = false;
     }
-    document.addEventListener("keydown", keyDownHandler);
+    document.addEventListener("keydown", keyDown);
+    document.addEventListener("keyup", keyUp);
 
-    function keyDownHandler(event) {
-        var keyPressed = String.fromCharCode(event.keyCode);
-        if (keyPressed == "W") {
+    function keyDown(e) {
+        if ((e.keyCode == 68) || (e.keyCode == 39)) {
             one = new Audio('./audio/foot.mp3');
             one.play();
             player.isMoving = true;
-        } else if (keyPressed == "S") {
-            player.isMoving = false;
         } else {
             player.isMoving = false;
+            player.isback = false;
         }
     }
 
+    function keyUp(e) {
+        if (e.keyCode == 65) {
+            one = new Audio('./audio/foot.mp3');
+            one.play();
+            player.isback = true;
+        } else {
+            player.isMoving = false;
+            player.isback = false;
+        }
+
+    }
 
     //grab the canvas and context
     var canvas = document.getElementById("mycanvas");
     var ctx = canvas.getContext("2d");
-
 
     //event listeners to move player
     canvas.addEventListener('mousedown', movePlayer);
@@ -102,18 +111,14 @@ window.addEventListener("load", function() {
     canvas.addEventListener('touchend', stopPlayer);
 
 
-
-
-
     //update the logic
     var update = function() {
 
         //check if you've won the game
-        if (checkCollision(player, goal)) {
+        if (Collision(player, ending)) {
 
             one = new Audio('./audio/what.mp3');
             one.play();
-
             swal('Yo.. you have won !', "Keep Going ", "./Images/up1.png", { button: "Aww yiss!" });
             level += 1;
             life += 1;
@@ -121,12 +126,13 @@ window.addEventListener("load", function() {
             player.x = 10;
             player.y = 260;
             player.isMoving = false;
+            player.isback = false;
 
-            for (var i = 0; i < enemies.length; i++) {
-                if (enemies[i].speedY > 1) {
-                    enemies[i].speedY += .25;
+            for (var i = 0; i < attackers.length; i++) {
+                if (attackers[i].speedY > 1) {
+                    attackers[i].speedY += .25;
                 } else {
-                    enemies[i].speedY -= .25;
+                    attackers[i].speedY -= .25;
                 }
             }
         }
@@ -134,13 +140,15 @@ window.addEventListener("load", function() {
         //update player
         if (player.isMoving) {
             player.x = player.x + player.speedX;
+        } else if (player.isback) {
+            player.x = player.x - player.speedX;
         }
 
-        //update enemies
-        enemies.forEach(function(element) {
+        //update attackers
+        attackers.forEach(function(enemy) {
 
             //check for collision with player
-            if (checkCollision(player, element)) {
+            if (Collision(player, enemy)) {
                 one = new Audio('./audio/oh_no.mp3');
                 one.play();
                 //stop the game
@@ -149,14 +157,14 @@ window.addEventListener("load", function() {
                     one = new Audio('./audio/cartoon_sound.mp3');
                     one.play();
 
-                    for (var i = 0; i < enemies.length; i++) {
+                    for (var i = 0; i < enemy.length; i++) {
 
-                        if (enemies[i].speedY > 2) {
-                            enemies[i].speedY = 3;
-                        } else if (enemies[i].speedY == 2) {
-                            enemies[i].speedY = 2;
+                        if (enemy[i].speedY > 2) {
+                            enemy[i].speedY = 3;
+                        } else if (enemy[i].speedY == 2) {
+                            enemy[i].speedY = 2;
                         } else {
-                            enemies[i].speedY = -3;
+                            enemy[i].speedY = -3;
                         }
                     }
                     level = 1;
@@ -171,20 +179,21 @@ window.addEventListener("load", function() {
                 player.x = 10;
                 player.y = 260;
                 player.isMoving = false;
+                player.isback = false;
             }
 
             //move enemy
-            element.y += element.speedY;
+            enemy.y += enemy.speedY;
 
             //check borders
-            if (element.y <= 10) {
-                element.y = 10;
-                //element.speedY = element.speedY * -1;
-                element.speedY *= -1;
-            } else if (element.y >= GAME_HEIGHT - 50) {
-                element.y = GAME_HEIGHT - 50;
-                //element.speedY=element.speedY*-1;
-                element.speedY *= -1;
+            if (enemy.y <= 10) {
+                enemy.y = 10;
+                //enemy.speedY = enemy.speedY * -1;
+                enemy.speedY *= -1;
+            } else if (enemy.y >= height - 50) {
+                enemy.y = height - 50;
+                //enemy.speedY=enemy.speedY*-1;
+                enemy.speedY *= -1;
             }
         });
     };
@@ -192,7 +201,7 @@ window.addEventListener("load", function() {
     //show the game on the screen
     var draw = function() {
         //clear the canvas
-        ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        ctx.clearRect(0, 0, width, height);
 
         //draw level
         ctx.font = "bold 15px Verdana";
@@ -208,40 +217,40 @@ window.addEventListener("load", function() {
         ctx.drawImage(img, player.x, player.y, player.w, player.h);
 
 
-        //draw enemies
+        //draw attackers
         // ctx.fillStyle = "orangered";
         var img = new Image();
         img.src = './Images/devil.png';
         //img.src = './Images/3.png';
-        enemies.forEach(function(element) {
-            ctx.drawImage(img, element.x, element.y, element.w, element.h);
+        attackers.forEach(function(enemy) {
+            ctx.drawImage(img, enemy.x, enemy.y, enemy.w, enemy.h);
         });
 
-        //draw goal
+        //draw ending point
         var img = new Image();
         img.src = './Images/base1.png';
         /*var img = document.getElementById("Land");*/
-        ctx.drawImage(img, goal.x, goal.y, goal.w, goal.h);
+        ctx.drawImage(img, ending.x, ending.y, ending.w, ending.h);
     };
 
     //gets executed multiple times per second
-    var step = function() {
+    var move = function() {
 
         update();
         draw();
 
-        if (gameLive) {
-            window.requestAnimationFrame(step);
+        if (Live) {
+            window.requestAnimationFrame(move);
         }
     };
 
     //check the collision between two rectangles
-    var checkCollision = function(rect1, rect2) {
+    var Collision = function(rect1, rect2) {
         var closeOnWidth = Math.abs(rect1.x - rect2.x) <= Math.max(rect1.w, rect2.w)
         var closeOnHeight = Math.abs(rect1.y - rect2.y) <= Math.max(rect1.h, rect2.h);
         return closeOnWidth && closeOnHeight;
     }
 
     //initial kick
-    step();
+    move();
 });
