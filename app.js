@@ -1,8 +1,4 @@
 window.addEventListener("load", function() {
-
-    /*one = new Audio('./audio / pink.mp3 ');
-    one.loop = true;
-    one.play(); */
     //constants
     var width = 1080;
     var height = 580;
@@ -13,6 +9,15 @@ window.addEventListener("load", function() {
     //current level
     var level = 1;
     var life = 5;
+
+    /* var enemies = [
+            {
+              x: 100, //x coordinate
+              y: 100, //y coordinate
+              speedY: 2, //speed in Y
+              w: 40, //width
+              h: 40 //heght
+            },*/
 
     //attackers
     var attackers = [{
@@ -47,18 +52,26 @@ window.addEventListener("load", function() {
         h: 40
     }];
 
-    //the player object
+    //the player object which is placed at starting point
     var player = {
         x: 10,
         y: 260,
         speedX: 2,
-        isback: false,
-        isMoving: false, //keep track whether the player is moving or not
+        isback: false, //keep track of the player is moving-backward or not
+        isForward: false, //keep track of the player is moving-forward or not
         w: 60,
         h: 60
     };
 
-    //the ending point object
+    /* //the goal object
+     var goal = {
+        x: 580,
+        y: 160,
+        w: 50,
+        h: 36
+      }; */
+
+    //the ending point object where the player will be going
     var ending = {
         x: 980,
         y: 240,
@@ -66,14 +79,18 @@ window.addEventListener("load", function() {
         h: 90
     }
 
-    var movePlayer = function() {
+    var Forward = function() {
         one = new Audio('./audio/foot.mp3');
         one.play();
-        player.isMoving = true;
+        player.isForward = true;
+    };
+
+    var stopMoving = function() {
+        player.isForward = false;
     }
-    var stopPlayer = function() {
-        player.isMoving = false;
-    }
+
+
+    //adding keyboard events
     document.addEventListener("keydown", keyDown);
     document.addEventListener("keyup", keyUp);
 
@@ -81,9 +98,9 @@ window.addEventListener("load", function() {
         if ((e.keyCode == 68) || (e.keyCode == 39)) {
             one = new Audio('./audio/foot.mp3');
             one.play();
-            player.isMoving = true;
+            player.isForward = true;
         } else {
-            player.isMoving = false;
+            player.isForward = false;
             player.isback = false;
         }
     }
@@ -94,7 +111,7 @@ window.addEventListener("load", function() {
             one.play();
             player.isback = true;
         } else {
-            player.isMoving = false;
+            player.isForward = false;
             player.isback = false;
         }
 
@@ -105,14 +122,25 @@ window.addEventListener("load", function() {
     var ctx = canvas.getContext("2d");
 
     //event listeners to move player
-    canvas.addEventListener('mousedown', movePlayer);
-    canvas.addEventListener('mouseup', stopPlayer);
-    canvas.addEventListener('touchstart', movePlayer);
-    canvas.addEventListener('touchend', stopPlayer);
-
+    canvas.addEventListener('mousedown', Forward);
+    canvas.addEventListener('mouseup', stopMoving);
+    canvas.addEventListener('touchstart', Forward);
+    canvas.addEventListener('touchend', stopMoving);
 
     //update the logic
     var update = function() {
+
+        /* level = level + 1;
+            player.x = 10;
+            document.title = "Level: " + level;
+            for ( var i = 0; i < enemies_length; i++ ) {
+                if ( enemies[i].speedY > 0 ) {
+                    enemies[i].speedY += 1;
+                } else {
+                    enemies[i].speedY -= 1;
+                }
+            }
+        }*/
 
         //check if you've won the game
         if (Collision(player, ending)) {
@@ -125,7 +153,7 @@ window.addEventListener("load", function() {
             player.speedX += .25;
             player.x = 10;
             player.y = 260;
-            player.isMoving = false;
+            player.isForward = false;
             player.isback = false;
 
             for (var i = 0; i < attackers.length; i++) {
@@ -137,8 +165,14 @@ window.addEventListener("load", function() {
             }
         }
 
+
+        /* //update player
+        if(player.isMoving) {
+           player.x = player.x + player.speedX;
+         }*/
+
         //update player
-        if (player.isMoving) {
+        if (player.isForward) {
             player.x = player.x + player.speedX;
         } else if (player.isback) {
             player.x = player.x - player.speedX;
@@ -178,7 +212,7 @@ window.addEventListener("load", function() {
 
                 player.x = 10;
                 player.y = 260;
-                player.isMoving = false;
+                player.isForward = false;
                 player.isback = false;
             }
 
@@ -202,23 +236,22 @@ window.addEventListener("load", function() {
     var draw = function() {
         //clear the canvas
         ctx.clearRect(0, 0, width, height);
-
         //draw level
         ctx.font = "bold 15px Verdana";
         ctx.fillStyle = "rgb(0,0,0)";
-        ctx.fillText("Level : " + level, 10, 15);
-        ctx.fillText("Life : " + life, 10, 35);
-        ctx.fillText("Hero's Speed : " + player.speedX, 10, 55);
+        ctx.fillText("Level : " + level, 10, 15); //to show this level on top left using width and height
+        ctx.fillText("Life : " + life, 10, 35); //to show this life on top left which is below level using width and height
+        ctx.fillText("Hero's Speed : " + player.speedX, 10, 55); // to show this hero's Speed which is below life using width and height
 
         //draw player
         var img = new Image();
         img.src = './Images/soldier1.png';
-        /*var img = document.getElementById("man");*/
+        //var img = document.getElementById("man");
         ctx.drawImage(img, player.x, player.y, player.w, player.h);
 
 
         //draw attackers
-        // ctx.fillStyle = "orangered";
+        //ctx.fillStyle = "orangered";
         var img = new Image();
         img.src = './Images/devil.png';
         //img.src = './Images/3.png';
@@ -227,9 +260,10 @@ window.addEventListener("load", function() {
         });
 
         //draw ending point
+        //ctx.fillstyle="Green"
         var img = new Image();
         img.src = './Images/base1.png';
-        /*var img = document.getElementById("Land");*/
+        //var img = document.getElementById("Land");
         ctx.drawImage(img, ending.x, ending.y, ending.w, ending.h);
     };
 
@@ -244,13 +278,22 @@ window.addEventListener("load", function() {
         }
     };
 
-    //check the collision between two rectangles
-    var Collision = function(rect1, rect2) {
-        var closeOnWidth = Math.abs(rect1.x - rect2.x) <= Math.max(rect1.w, rect2.w)
+    /*  var checkCollision = function(rect1, rect2) {
+
+        var closeOnWidth = Math.abs(rect1.x - rect2.x) <= Math.max(rect1.w, rect2.w);
         var closeOnHeight = Math.abs(rect1.y - rect2.y) <= Math.max(rect1.h, rect2.h);
         return closeOnWidth && closeOnHeight;
+      };*/
+
+    //check the collision between two rectangles
+    var Collision = function(rect1, rect2) {
+        var closeW = Math.abs(rect1.x - rect2.x) <= Math.max(rect1.w, rect2.w);
+        //where player 'x' and attacker 'x' co-ordinates are checked whether they are colliding each other or no with respect to the player width and attacker width.
+        var closeH = Math.abs(rect1.y - rect2.y) <= Math.max(rect1.h, rect2.h);
+        //where player 'y' and attacker 'y' co-ordinates are checked whether they are colliding each other or no with respect to the player height and attacker height.
+        return closeW && closeH;
     }
 
-    //initial kick
+    //initial move
     move();
 });
